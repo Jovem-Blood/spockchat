@@ -1,0 +1,61 @@
+<script lang="ts">
+  export let username: string;
+</script>
+
+<div class="typing-zone">
+  <p>{username} is typing</p>
+  <div class="typing">
+    <div class="typing__dot" />
+    <div class="typing__dot" />
+    <div class="typing__dot" />
+  </div>
+</div>
+
+<style>
+  .typing-zone {
+    display: flex;
+    align-items: center;
+  }
+
+  .typing {
+    padding-top: 10px;
+    margin-left: 5px;
+    background: #af434300;
+    border-radius: 20px;
+  }
+
+  .typing__dot {
+    float: left;
+    width: 8px;
+    height: 8px;
+    margin: 0 4px;
+    background: #371da0;
+    border-radius: 50%;
+    opacity: 0;
+    animation: loadingFade 1s infinite;
+  }
+
+  .typing__dot:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .typing__dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .typing__dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes loadingFade {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+</style>
