@@ -4,21 +4,21 @@
   export let messages: any[];
 
   let autoscroll: boolean;
-  // let scroll: number;
   let div: any;
 
-  // afterUpdate(() => {
-  //   if (messages) scrollToBottom(div);
-  // });
+  const renderer = {
+    heading() {
+      return ``;
+    },
+    html() {
+      return ``;
+    },
+    code() {
+      return ``;
+    },
+  };
 
-  // $: if (messages && div) {
-  //   scrollToBottom(div);
-  // }
-
-  // const scrollToBottom = async (div: HTMLDivElement) => {
-  //   scroll = div.scrollHeight;
-  // };
-
+  marked.use({ renderer });
   beforeUpdate(() => {
     autoscroll =
       div && div.offsetHeight + div.scrollTop > div.scrollHeight - 20;
