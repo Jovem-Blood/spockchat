@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy, afterUpdate, beforeUpdate} from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { currentUser, pb } from "./pocketbase";
   import Messages from "./Messages.svelte";
   import Typing from "./Typing.svelte";
@@ -22,7 +22,7 @@
     stopTyping();
   }
 
-  function stopTyping(timer=5000) {
+  function stopTyping(timer = 5000) {
     len = newMessage.length;
     setTimeout(() => {
       if (newMessage.length == len && typing == true) {
@@ -50,7 +50,7 @@
       console.log("Error while sending message, please try again");
     }
     newMessage = "";
-    stopTyping(0)
+    stopTyping(0);
   }
 
   onMount(async () => {
@@ -60,6 +60,7 @@
     });
 
     messages = resultList.items.reverse();
+
     unsubscribe = await pb
       .collection("messages")
       .subscribe("*", async ({ action, record }) => {
@@ -87,12 +88,16 @@
   onDestroy(() => {
     unsubscribe?.();
   });
+  function handdleKeyDown(key) {
+    // if(key.code == "Enter") {
+    if (key.code == "Enter" && !key.shiftKey) {
+      sendMessage();
+    }
+  }
 </script>
 
-
-<Messages {messages} />
-
-<form on:submit|preventDefault={sendMessage}>
+<div class="messages-box">
+  <Messages {messages} />
   <div class="bottom-form">
     {#if typingUser}
       <Typing username={typingUser.username} />
@@ -101,32 +106,37 @@
         <Typing username="nobody" />
       </div>
     {/if}
-    <input
+    <textarea
       class="input-message"
       placeholder="Message..."
-      type="text"
       bind:value={newMessage}
+      on:keydown={handdleKeyDown}
     />
   </div>
-</form>
+</div>
 
 <style>
-  .input-message {
+  .messages-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     width: 100%;
-    padding: 2%;
+    margin: auto;
+    max-height: 100vh;
+  }
+  .input-message {
+    resize: none;
     border-radius: 10px;
     border: none;
     box-shadow: 1px 0px 6px 2px #371da0;
     outline-width: 0;
+    width: 100%;
   }
   .bottom-form {
+    width: 99%;
     display: flex;
     flex-direction: column;
     align-items: start;
-  }
-  form {
-    position: fixed;
-    bottom: 0;
-    width: 50%;
   }
 </style>
