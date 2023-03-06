@@ -72,7 +72,6 @@
     color: gray;
     border-radius: 15px;
     padding: 5%;
-    width: 100%;
   }
   .input-area {
     display: flex;
