@@ -3,33 +3,33 @@
   import { marked } from "marked";
   export let messages: any[];
 
-  // let autoscroll: boolean;
-  let scroll: number;
-  let div;
-
-  afterUpdate(() => {
-    if (messages) scrollToBottom(div);
-  });
-
-  $: if (messages && div) {
-    scrollToBottom(div);
-  }
-
-  const scrollToBottom = async (div: HTMLDivElement) => {
-    scroll = div.scrollHeight;
-  };
-
-  // beforeUpdate(() => {
-  //   autoscroll =
-  //     div && div.offsetHeight + div.scrollTop > div.scrollHeight - 20;
-  // });
+  let autoscroll: boolean;
+  // let scroll: number;
+  let div: any;
 
   // afterUpdate(() => {
-  //   if (autoscroll) div.scrollTo(0, div.scrollHeight);
+  //   if (messages) scrollToBottom(div);
   // });
+
+  // $: if (messages && div) {
+  //   scrollToBottom(div);
+  // }
+
+  // const scrollToBottom = async (div: HTMLDivElement) => {
+  //   scroll = div.scrollHeight;
+  // };
+
+  beforeUpdate(() => {
+    autoscroll =
+      div && div.offsetHeight + div.scrollTop > div.scrollHeight - 20;
+  });
+
+  afterUpdate(() => {
+    if (autoscroll) div.scrollTo(0, div.scrollHeight);
+  });
 </script>
 
-<svelte:window bind:scrollY={scroll}/>
+<!-- <svelte:window bind:scrollY={scroll} /> -->
 
 <div bind:this={div} class="messages ">
   {#each messages as message (message.id)}
