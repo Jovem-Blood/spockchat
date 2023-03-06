@@ -55,11 +55,11 @@
 
   onMount(async () => {
     const resultList = await pb.collection("messages").getList(1, 50, {
-      sort: "created",
+      sort: "-created",
       expand: "user_id",
     });
-    messages = resultList.items;
 
+    messages = resultList.items.reverse();
     unsubscribe = await pb
       .collection("messages")
       .subscribe("*", async ({ action, record }) => {
