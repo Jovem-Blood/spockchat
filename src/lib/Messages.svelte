@@ -60,6 +60,7 @@
     margin-bottom: 2rem;
   }
   .messages {
+    text-align: initial;
     overflow-y: scroll;
     width: 100%;
     display: flex;
@@ -75,10 +76,6 @@
     justify-content: center;
     align-items: center;
 
-    /* align-self: center; */
-    /* justify-self: end; */
-    /* margin-right: 1rem; */
-    /* grid-column: 1; */
   }
   .avatar-wrapper img {
     width: 32px;
