@@ -29,60 +29,65 @@
   });
 </script>
 
-<!-- <svelte:window bind:scrollY={scroll} /> -->
-
 <div bind:this={div} class="messages ">
-  {#each messages as message (message.id)}
-    <div class="message-area">
-      <div class="avatar-wrapper">
-        <img
-          class="avatar"
-          src={`https://api.dicebear.com/5.x/identicon/svg?seed=${message.expand?.user_id?.username}`}
-          width="30px"
-          alt="user avatar"
-        />
+  <div class="message-area">
+    {#each messages as message (message[0]?.id)}
+      <div class="message-item">
+        <div class="avatar-wrapper">
+          <img
+            src={`https://api.dicebear.com/5.x/identicon/svg?seed=${message[0]?.expand?.user_id?.username}`}
+            alt="user avatar"
+          />
+        </div>
+
+        <div class="message">
+          <span>
+            {message[0]?.expand?.user_id?.username}
+          </span>
+
+          {#each message as text}
+            <span class="message-text"> {@html marked(text.content)} </span>
+          {/each}
+        </div>
       </div>
-      <span class="message">
-        {message.expand?.user_id?.username}:&nbsp; {@html marked(
-          message.content
-        )}
-      </span>
-      <!-- <p class="msg-text">{message.content}</p> -->
-    </div>
-  {/each}
+    {/each}
+  </div>
 </div>
 
 <style>
+  .message-item {
+    display: flex;
+    margin-bottom: 2rem;
+  }
   .messages {
-    margin-bottom: 10%;
+    overflow-y: scroll;
+    width: 100%;
+    display: flex;
+    justify-content: start;
   }
   .avatar-wrapper {
     border-radius: 50px;
     background: azure;
     width: fit-content;
     height: fit-content;
-    padding: 7%;
+    padding: 0.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
 
-    align-self: center;
-    justify-self: end;
-    margin-right: 1rem;
-    grid-column: 1;
+    /* align-self: center; */
+    /* justify-self: end; */
+    /* margin-right: 1rem; */
+    /* grid-column: 1; */
+  }
+  .avatar-wrapper img {
+    width: 32px;
   }
 
-  .message-area {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    margin-bottom: 2%;
-  }
   .message {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    align-self: center;
-    justify-self: start;
-    grid-column: 2/5;
+    align-items: start;
+    margin-left: 1rem;
+    flex-direction: column;
   }
 </style>

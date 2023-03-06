@@ -6,11 +6,15 @@
 
   let newMessage = "";
   let messages = [];
+  let userMessages = [];
   let unsubscribe: () => void;
   let typing = false;
   let typingUser: any;
   let len = 0;
 
+  let getUserId = (m: any) => {
+    return m?.expand?.user_id?.id;
+  };
   function startTyping() {
     if (typing == false) {
       typing = true;
@@ -27,7 +31,6 @@
       if (newMessage.length == len && typing == true) {
         typing = false;
         console.log("stoTyping...");
-
         pb.collection("users").update($currentUser.id, { typing });
       } else {
       }
@@ -60,6 +63,20 @@
 
     messages = resultList.items.reverse();
 
+    let pivo = [];
+    messages.forEach((m, i) => {
+      if (getUserId(m) == getUserId(messages[i - 1])) {
+        pivo.push(m);
+      } else {
+        userMessages.push([...pivo]);
+        pivo = [];
+        pivo.push(m);
+      }
+    });
+    userMessages.push([...pivo]);
+    userMessages.shift();
+    userMessages = userMessages;
+
     unsubscribe = await pb
       .collection("messages")
       .subscribe("*", async ({ action, record }) => {
@@ -67,6 +84,13 @@
           const user_id = await pb.collection("users").getOne(record.user_id);
           record.expand = { user_id };
           messages = [...messages, record];
+
+          if (getUserId(record) == getUserId(userMessages.slice(-1)[0][0])) {
+            userMessages.slice(-1)[0].push(record);
+          } else {
+            userMessages.push([record]);
+          }
+          userMessages = userMessages;
         }
 
         if (action == "delete") {
@@ -82,13 +106,11 @@
         typingUser = "";
       }
     });
-    // console.log(await messages[0])
   });
   onDestroy(() => {
     unsubscribe?.();
   });
-  function handdleKeyDown(key) {
-    // if(key.code == "Enter") {
+  function handdleKeyDown(key: KeyboardEvent) {
     if (key.code == "Enter" && !key.shiftKey) {
       sendMessage();
     }
@@ -96,7 +118,7 @@
 </script>
 
 <div class="messages-box">
-  <Messages {messages} />
+  <Messages messages={userMessages} />
   <div class="bottom-form">
     {#if typingUser}
       <Typing username={typingUser.username} />
