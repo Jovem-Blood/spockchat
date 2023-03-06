@@ -11,7 +11,6 @@
   let typingUser: any;
   let len = 0;
 
-
   function startTyping() {
     if (typing == false) {
       typing = true;
