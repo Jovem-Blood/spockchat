@@ -28,7 +28,7 @@
       });
   }
   function changeAction() {
-    action = action == "login" ? "singup" : "login";
+    action = action == "login" ? "signup" : "login";
   }
   function handleSubmit() {
     if (action == "login") {
@@ -57,7 +57,7 @@
       <button type="submit">Logar</button>
       <a href={action} on:click|preventDefault={changeAction}>Não tenho conta</a>
 
-    {:else if action == "singup"}
+    {:else if action == "signup"}
       <button type="submit">Criar conta</button>
       <a href={action} on:click|preventDefault={changeAction}>Já tenho conta</a>
     {/if}
