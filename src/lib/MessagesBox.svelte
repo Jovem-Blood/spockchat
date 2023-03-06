@@ -20,7 +20,6 @@
     if (typing == false) {
       typing = true;
       pb.collection("users").update($currentUser.id, { typing });
-      console.log("startTyping...");
     }
 
     clearTimeout(typingTimmer);
@@ -32,7 +31,6 @@
     typingTimmer = setTimeout(() => {
       if (newMessage.length == len && typing == true) {
         typing = false;
-        console.log("stoTyping...");
         pb.collection("users").update($currentUser.id, { typing });
       } else {
       }
