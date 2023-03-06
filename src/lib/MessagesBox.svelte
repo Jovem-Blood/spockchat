@@ -10,6 +10,7 @@
   let unsubscribe: () => void;
   let typing = false;
   let typingUser: any;
+  let typingTimmer: any;
   let len = 0;
 
   let getUserId = (m: any) => {
@@ -22,12 +23,13 @@
       console.log("startTyping...");
     }
 
+    clearTimeout(typingTimmer);
     stopTyping();
   }
 
   function stopTyping(timer = 5000) {
     len = newMessage.length;
-    setTimeout(() => {
+    typingTimmer = setTimeout(() => {
       if (newMessage.length == len && typing == true) {
         typing = false;
         console.log("stoTyping...");
