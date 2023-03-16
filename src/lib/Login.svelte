@@ -32,9 +32,9 @@
   }
   function handleSubmit() {
     if (action == "login") {
-      logIn()
+      logIn();
     } else {
-      signUp()
+      signUp();
     }
   }
 </script>
@@ -42,7 +42,6 @@
 <div class="myDiv">
   <h3 style="text-transform: capitalize;">{action}</h3>
   <form on:submit|preventDefault={handleSubmit}>
-
     <div class="input-area">
       <label for="username">Nome de usuário:</label>
       <input placeholder="username" type="text" bind:value={username} />
@@ -56,7 +55,6 @@
     {#if action == "login"}
       <button type="submit">Logar</button>
       <a href={action} on:click|preventDefault={changeAction}>Não tenho conta</a>
-
     {:else if action == "signup"}
       <button type="submit">Criar conta</button>
       <a href={action} on:click|preventDefault={changeAction}>Já tenho conta</a>
@@ -71,6 +69,7 @@
     background: white;
     color: gray;
     border-radius: 15px;
+    margin: auto;
     padding: 5%;
   }
   .input-area {
