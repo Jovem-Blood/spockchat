@@ -1,8 +1,9 @@
 <script lang="ts">
   import { afterUpdate, beforeUpdate } from "svelte";
+  import { pb } from "./pocketbase";
   import { marked } from "marked";
-  export let messages: any[];
 
+  export let messages: any[];
   let autoscroll: boolean;
   let div: any;
 
@@ -29,7 +30,7 @@
   });
 </script>
 
-<div bind:this={div} class="messages ">
+<div bind:this={div} class="messages">
   <div class="message-area">
     {#each messages as message (message[0]?.id)}
       <div class="message-item">
@@ -47,6 +48,9 @@
 
           {#each message as text}
             <span class="message-text"> {@html marked(text.content)} </span>
+            {#if text.archive}
+              <img src={pb.getFileUrl(text, text.archive)} alt="file pic" />
+            {/if}
           {/each}
         </div>
       </div>
@@ -75,7 +79,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-
   }
   .avatar-wrapper img {
     width: 32px;

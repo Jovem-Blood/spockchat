@@ -12,6 +12,8 @@
   let typingUser: any;
   let typingTimmer: any;
   let len = 0;
+  let img: string | Blob;
+  let imgPreview: string | ArrayBuffer;
 
   let getUserId = (m: any) => {
     return m?.expand?.user_id?.id;
@@ -42,16 +44,20 @@
   }
 
   async function sendMessage() {
-    const data = {
-      content: newMessage,
-      user_id: $currentUser.id,
-    };
-    const createdMessage = await pb.collection("messages").create(data);
+    const formData = new FormData();
+    formData.append("content", newMessage);
+    formData.append("user_id", $currentUser.id);
+
+    if (img) formData.append("archive", img);
+
+    const createdMessage = await pb.collection("messages").create(formData);
 
     if (!createdMessage) {
       console.log("Error while sending message, please try again");
     }
     newMessage = "";
+    img = null;
+    imgPreview = null;
     stopTyping(0);
   }
 
@@ -110,15 +116,31 @@
   onDestroy(() => {
     unsubscribe?.();
   });
-  function handdleKeyDown(key: KeyboardEvent) {
+  function handleKeyDown(key: KeyboardEvent) {
     if (key.code == "Enter" && !key.shiftKey) {
+      key.preventDefault();
       sendMessage();
+    }
+  }
+  function handlePaste(pasteEvent: ClipboardEvent) {
+    let item = pasteEvent.clipboardData.items[0];
+    if (item.type.indexOf("image") === 0) {
+      img = item.getAsFile();
+
+      let reader = new FileReader();
+      reader.readAsDataURL(img);
+      reader.onload = function (event) {
+        imgPreview = event.target.result;
+      };
     }
   }
 </script>
 
 <div class="messages-box">
   <Messages messages={userMessages} />
+  {#if imgPreview}
+    <img src={imgPreview.toString()} alt="sus" width="120px" />
+  {/if}
   <div class="bottom-form">
     {#if typingUser}
       <Typing username={typingUser.username} />
@@ -127,16 +149,33 @@
         <Typing username="nobody" />
       </div>
     {/if}
-    <textarea
-      class="input-message"
-      placeholder="Message..."
-      bind:value={newMessage}
-      on:keydown={handdleKeyDown}
-    />
+    <div class="input-group">
+      <textarea
+        class="input-message"
+        placeholder="Message..."
+        bind:value={newMessage}
+        on:paste={handlePaste}
+        on:keydown={handleKeyDown}
+      />
+      <button class="send-message" on:click={sendMessage}>-></button>
+    </div>
   </div>
 </div>
 
 <style>
+  .send-message {
+    display: none;
+  }
+  .input-group {
+    display: flex;
+    width: 100%;
+  }
+  @media (max-width: 600px) {
+    .send-message {
+      display: block;
+      width: 15%;
+    }
+  }
   .messages-box {
     display: flex;
     flex-direction: column;
