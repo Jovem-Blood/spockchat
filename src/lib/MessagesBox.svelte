@@ -3,6 +3,7 @@
   import { currentUser, pb } from "./pocketbase";
   import Messages from "./Messages.svelte";
   import Typing from "./Typing.svelte";
+  import { DateTime as dt } from "luxon";
 
   let newMessage = "";
   let messages = [];
@@ -90,8 +91,13 @@
           const user_id = await pb.collection("users").getOne(record.user_id);
           record.expand = { user_id };
           messages = [...messages, record];
+          const lastUserMsg = userMessages.slice(-1)[0][0];
+          const dateDiff = dt
+            .now()
+            .diff(dt.fromSQL(lastUserMsg.created))
+            .as("minutes");
 
-          if (getUserId(record) == getUserId(userMessages.slice(-1)[0][0])) {
+          if (getUserId(record) == getUserId(lastUserMsg) && dateDiff <= 5) {
             userMessages.slice(-1)[0].push(record);
           } else {
             userMessages.push([record]);

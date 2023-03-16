@@ -2,6 +2,7 @@
   import { afterUpdate, beforeUpdate } from "svelte";
   import { pb } from "./pocketbase";
   import { marked } from "marked";
+  import { DateTime  as dt} from "luxon";
 
   export let messages: any[];
   let autoscroll: boolean;
@@ -28,6 +29,11 @@
   afterUpdate(() => {
     if (autoscroll) div.scrollTo(0, div.scrollHeight);
   });
+
+  function ppt(timestamp: string): string {
+    return dt.fromSQL(timestamp).setLocale('pt-BR').toLocaleString(dt.DATETIME_SHORT)
+  }
+
 </script>
 
 <div bind:this={div} class="messages">
@@ -43,7 +49,7 @@
 
         <div class="message">
           <span>
-            {message[0]?.expand?.user_id?.username}
+            {message[0]?.expand?.user_id?.username} <small>{ppt(message[0]?.created)}</small>
           </span>
 
           {#each message as text}
