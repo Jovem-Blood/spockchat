@@ -4,25 +4,28 @@
   import Messages from "./Messages.svelte";
   import Typing from "./Typing.svelte";
   import { DateTime as dt } from "luxon";
+  import type { User, Message } from './global';
+
 
   let newMessage = "";
-  let messages = [];
-  let userMessages = [];
+  let messages: Message[] = [];
+  let userMessages: Array<Message[]> = [];
   let unsubscribe: () => void;
   let typing = false;
-  let typingUser: any;
-  let typingTimmer: any;
+  let typingUser: User;
+  let typingTimmer: NodeJS.Timeout;
   let len = 0;
   let img: string | Blob;
   let imgPreview: string | ArrayBuffer;
 
-  let getUserId = (m: any) => {
-    return m?.expand?.user_id?.id;
+  let getUserId = (m: Message) => {
+    return m.expand.user_id.id;
   };
+
   function startTyping() {
     if (typing == false) {
       typing = true;
-      pb.collection("users").update($currentUser.id, { typing });
+      pb.collection("users").update($currentUser.id, { typing: typing });
     }
 
     clearTimeout(typingTimmer);
@@ -34,7 +37,7 @@
     typingTimmer = setTimeout(() => {
       if (newMessage.length == len && typing == true) {
         typing = false;
-        pb.collection("users").update($currentUser.id, { typing });
+        pb.collection("users").update($currentUser.id, { typing: typing });
       } else {
       }
     }, timer);
@@ -70,8 +73,8 @@
 
     messages = resultList.items.reverse();
 
-    let pivo = [];
-    messages.forEach((m, i) => {
+    let pivo: Message[] = [];
+    messages.forEach((m: Message, i: number) => {
       if (getUserId(m) == getUserId(messages[i - 1])) {
         pivo.push(m);
       } else {
@@ -87,27 +90,27 @@
     unsubscribe = await pb
       .collection("messages")
       .subscribe("*", async ({ action, record }) => {
-        if (action == "create") {
-          const user_id = await pb.collection("users").getOne(record.user_id);
-          record.expand = { user_id };
-          messages = [...messages, record];
-          const lastUserMsg = userMessages.slice(-1)[0][0];
-          const dateDiff = dt
-            .now()
-            .diff(dt.fromSQL(lastUserMsg.created))
-            .as("minutes");
-
-          if (getUserId(record) == getUserId(lastUserMsg) && dateDiff <= 5) {
-            userMessages.slice(-1)[0].push(record);
-          } else {
-            userMessages.push([record]);
-          }
-          userMessages = userMessages;
-        }
-
         if (action == "delete") {
           messages = messages.filter((m) => m.id !== record.id);
+          return;
         }
+        if (action !== "create") return;
+
+        const user_id = await pb.collection("users").getOne(record.user_id);
+        record.expand = { user_id };
+        messages = [...messages, record];
+        const lastUserMsg = userMessages.slice(-1)[0][0];
+        const dateDiff = dt
+          .now()
+          .diff(dt.fromSQL(lastUserMsg.created))
+          .as("minutes");
+
+        if (getUserId(record) == getUserId(lastUserMsg) && dateDiff <= 5) {
+          userMessages.slice(-1)[0].push(record);
+        } else {
+          userMessages.push([record]);
+        }
+        userMessages = userMessages;
       });
     pb.collection("users").subscribe("*", async ({ action, record }) => {
       if (action !== "update" || record.id == $currentUser.id) return;
@@ -115,13 +118,14 @@
       if (record.typing !== false) {
         typingUser = record;
       } else {
-        typingUser = "";
+        typingUser = null;
       }
     });
   });
   onDestroy(() => {
     unsubscribe?.();
   });
+
   function handleKeyDown(key: KeyboardEvent) {
     if (key.code == "Enter" && !key.shiftKey) {
       key.preventDefault();
@@ -132,7 +136,6 @@
     let item = pasteEvent.clipboardData.items[0];
     if (item.type.indexOf("image") === 0) {
       img = item.getAsFile();
-
       let reader = new FileReader();
       reader.readAsDataURL(img);
       reader.onload = function (event) {

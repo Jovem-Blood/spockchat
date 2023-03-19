@@ -3,8 +3,10 @@
   import { pb } from "./pocketbase";
   import { marked } from "marked";
   import { DateTime  as dt} from "luxon";
+  import type { Message } from "./global";
 
-  export let messages: any[];
+  export let messages: Array<Message[]> = [];
+
   let autoscroll: boolean;
   let div: any;
 
