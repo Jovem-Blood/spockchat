@@ -8,7 +8,7 @@
   export let messages: Array<Message[]> = [];
 
   let autoscroll: boolean;
-  let div: any;
+  let div: HTMLElement;
 
   const renderer = {
     heading() {

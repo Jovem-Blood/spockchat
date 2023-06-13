@@ -19,7 +19,7 @@
   let imgPreview: string | ArrayBuffer;
 
   let getUserId = (m: Message) => {
-    return m.expand.user_id.id;
+    return m?.expand?.user_id?.id;
   };
 
   function startTyping() {
@@ -96,6 +96,7 @@
         }
         if (action !== "create") return;
 
+        // NOTE: Records from subcribe updates don't have expand
         const user_id = await pb.collection("users").getOne(record.user_id);
         record.expand = { user_id };
         messages = [...messages, record];
